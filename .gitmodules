@@ -1,3 +1,6 @@
 [submodule "lemmy-ui/lemmy-ui"]
 	path = lemmy-ui/lemmy-ui
 	url = https://github.com/LemmyNet/lemmy-ui.git
+[submodule "lemmy/lemmy"]
+	path = lemmy/lemmy
+	url = https://github.com/LemmyNet/lemmy.git
