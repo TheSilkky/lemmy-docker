@@ -20,10 +20,11 @@ services:
       - LEMMY_DATABASE_URL=postgres://lemmy:${DATABASE_PASSWORD}@lemmy:5432/lemmy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.lemmy.rule=Host(`${API_HOST}`)"
+      - "traefik.http.routers.lemmy.rule=Host(`${HOST}`) && PathRegexp(`^/(api|pictrs|feeds|nodeinfo|\.well-known)$`) || (Method(`GET`, `HEAD`) && HeaderRegexp(`Accept`, `^application/(activity|ld)\+json$`)) || !Method(`GET`, `HEAD`)"
       - "traefik.http.routers.lemmy.entryPoints=websecure"
       - "traefik.http.routers.lemmy.tls.certResolver=le"
       - "traefik.http.routers.lemmy.service=lemmy"
+      - "traefik.http.services.lemmy.loadbalancer.server.port=8536"
 
   postgres:
     image: postgres:15.3-alpine3.18
