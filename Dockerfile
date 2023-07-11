@@ -15,17 +15,8 @@ RUN mkdir -pv "${CARGO_HOME}" && \
 
 WORKDIR /lemmy
 
-RUN mkdir src && \
-    touch src/lib.rs && \
-    echo "fn main() {}" > src/main.rs
-COPY lemmy/Cargo.* ./
-RUN cargo build --target=aarch64-unknown-linux-musl --release && \
-    rm -rf src
-
 COPY lemmy ./
-RUN touch src/main.rs && \
-    touch src/lib.rs && \
-    cargo build --target=aarch64-unknown-linux-musl --release
+RUN cargo build --target=aarch64-unknown-linux-musl --release
 
 ####################################################################################################
 ## AMD64 builder
@@ -41,17 +32,8 @@ RUN mkdir -pv "${CARGO_HOME}" && \
 
 WORKDIR /lemmy
 
-RUN mkdir src && \
-    touch src/lib.rs && \
-    echo "fn main() {}" > src/main.rs
-COPY lemmy/Cargo.* ./
-RUN cargo build --target=x86_64-unknown-linux-musl --release && \
-    rm -rf src
-
 COPY lemmy ./
-RUN touch src/main.rs && \
-    touch src/lib.rs && \
-    cargo build --target=x86_64-unknown-linux-musl --release
+RUN cargo build --target=x86_64-unknown-linux-musl --release
 
 ####################################################################################################
 ## Intermediate build stage 
