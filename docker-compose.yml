@@ -1,0 +1,38 @@
+networks:
+  public:
+    external: true
+
+volumes:
+  database:
+
+services:
+  lemmy:
+    image: thesilkky/lemmy:0.18.1
+    container_name: lemmy
+    depends_on:
+      - postgres
+    restart: always
+    hostname: lemmy
+    networks:
+      - public
+      - default
+    environment:
+      - LEMMY_DATABASE_URL=postgres://lemmy:${DATABASE_PASSWORD}@lemmy:5432/lemmy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.lemmy.rule=Host(`${API_HOST}`)"
+      - "traefik.http.routers.lemmy.entryPoints=websecure"
+      - "traefik.http.routers.lemmy.tls.certResolver=le"
+      - "traefik.http.routers.lemmy.service=lemmy"
+
+  postgres:
+    image: postgres:15.3-alpine3.18
+    restart: always
+    hostname: postgres
+    volumes:
+      - database:/var/lib/postgresql/data
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - POSTGRES_DB=lemmy
+      - POSTGRES_USER=lemmy
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
