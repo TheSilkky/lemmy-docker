@@ -5,9 +5,9 @@ networks:
 volumes:
   database:
 
-configs:
-  lemmy-config:
-    file: ./lemmy.hjson.tpl
+#configs:
+#  lemmy-config:
+#    file: ./lemmy.hjson.tpl
 
 services:
   lemmy:
@@ -21,9 +21,9 @@ services:
     networks:
       - public
       - default
-    configs:
-      - source: lemmy-config
-        target: /usr/local/etc/lemmy/lemmy.hjson.tpl
+#    configs:
+#      - source: lemmy-config
+#        target: /usr/local/etc/lemmy/lemmy.hjson.tpl
     environment:
       - LEMMY_HOSTNAME=${HOST}
       - LEMMY_DATABASE_URI=postgres://lemmy:${DATABASE_PASSWORD}@lemmy:5432/lemmy
@@ -40,7 +40,7 @@ services:
       - LEMMY_SETUP_SITE_NAME=${SETUP_SITE_NAME}
     labels:
       - traefik.enable=true
-      - traefik.http.routers.lemmy.rule=Host(`${HOST}`) && PathRegexp(`^/(api|pictrs|feeds|nodeinfo|.well-known)$`) || (Method(`GET`, `HEAD`) && HeaderRegexp(`Accept`, `^application/(activity|ld)+json$`)) || !Method(`GET`, `HEAD`)
+      - traefik.http.routers.lemmy.rule=Host(`${HOST}`) && PathRegexp(`^/(api|pictrs|feeds|nodeinfo|\.well-known)$`) || (Method(`GET`, `HEAD`) && HeaderRegexp(`Accept`, `^application/(activity|ld)\+json$`)) || !Method(`GET`, `HEAD`)
       - traefik.http.routers.lemmy.entryPoints=websecure
       - traefik.http.routers.lemmy.tls.certResolver=le
       - traefik.http.routers.lemmy.service=lemmy
