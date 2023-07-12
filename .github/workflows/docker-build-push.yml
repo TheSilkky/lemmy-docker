@@ -223,7 +223,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
-          context: ./lemmy-ui
+          context: ./pict-rs
           build-args: PICTRS_VERSION=${{ env.pictrs_version }}
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
