@@ -7,18 +7,13 @@ ARG LEMMY_UI_VERSION
 ####################################################################################################
 ## Builder
 ####################################################################################################
-FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS builder
+FROM --platform=${BUILDPLATFORM} node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS builder
 
 ARG LEMMY_UI_VERSION
-ARG TARGETARCH
 
-ENV npm_config_target_arch=${TARGETARCH}
-ENV npm_config_target_platform=linux
-ENV npm_config_target_libc=musl
 ENV NODE_OPTIONS=--max_old_space_size=8192
 
 RUN apk add --no-cache \
-    build-base \
     git
 
 ADD --keep-git-dir=true https://github.com/LemmyNet/lemmy-ui.git#${LEMMY_UI_VERSION} /tmp/lemmy-ui
@@ -26,7 +21,7 @@ ADD --keep-git-dir=true https://github.com/LemmyNet/lemmy-ui.git#${LEMMY_UI_VERS
 WORKDIR /lemmy-ui
 
 RUN cp /tmp/lemmy-ui/package.json /tmp/lemmy-ui/yarn.lock . && \
-    yarn --production --prefer-offline --pure-lockfile --network-timeout=1000000
+    yarn --production --prefer-offline --pure-lockfile
 
 RUN cp -a /tmp/lemmy-ui/. . && rm -r /tmp/lemmy-ui && \
     echo "export const VERSION = '$(git describe --tag)';" > "src/shared/version.ts" && \
@@ -39,12 +34,10 @@ FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION}
 
 WORKDIR /lemmy-ui
 
-COPY --from=builder /lemmy-ui/package.json /lemmy-ui/yarn.lock ./
+COPY --from=builder /lemmy-ui/node_modules ./node_modules
 COPY --from=builder /lemmy-ui/dist ./dist
 
-RUN yarn install --production --prefer-offline --pure-lockfile --network-timeout=1000000 && \
-    yarn cache clean && \
-    chown -R node:node /lemmy-ui
+RUN chown -R node:node /lemmy-ui
 
 USER node
 
