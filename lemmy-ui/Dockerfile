@@ -12,9 +12,6 @@ FROM --platform=${BUILDPLATFORM} node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS
 ARG TARGETARCH
 ARG LEMMY_UI_VERSION
 
-ENV npm_config_target_arch=${TARGETARCH}
-ENV npm_config_target_platform=linux
-ENV npm_config_target_libc=musl
 ENV NODE_OPTIONS=--max_old_space_size=8192
 
 RUN apk add --no-cache \
@@ -25,7 +22,7 @@ ADD --keep-git-dir=true https://github.com/LemmyNet/lemmy-ui.git#${LEMMY_UI_VERS
 WORKDIR /lemmy-ui
 
 RUN cp /tmp/lemmy-ui/package.json /tmp/lemmy-ui/yarn.lock . && \
-    yarn --production --prefer-offline --pure-lockfile
+    npm_config_target_arch=${TARGETARCH} yarn --production --prefer-offline --pure-lockfile
 
 RUN cp -r /tmp/lemmy-ui/. . && rm -r /tmp/lemmy-ui && \
     echo "export const VERSION = '$(git describe --tag)';" > "src/shared/version.ts" && \
