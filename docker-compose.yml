@@ -26,6 +26,25 @@ services:
       - "traefik.http.routers.lemmy.service=lemmy"
       - "traefik.http.services.lemmy.loadbalancer.server.port=8536"
 
+  lemmy-ui:
+    image: thesilkky/lemmy-ui:0.18.1
+    restart: always
+    hostname: lemmy-ui
+    networks:
+      - public
+      - default
+    environment:
+      - LEMMY_UI_LEMMY_INTERNAL_HOST=lemmy:8536
+      - LEMMY_UI_LEMMY_EXTERNAL_HOST=${HOST}
+      - LEMMY_UI_HTTPS=true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.lemmy-ui.rule=Host(`${HOST}`)"
+      - "traefik.http.routers.lemmy-ui.entryPoints=websecure"
+      - "traefik.http.routers.lemmy-ui.tls.certResolver=le"
+      - "traefik.http.routers.lemmy-ui.service=lemmy-ui"
+      - "traefik.http.services.lemmy-ui.loadbalancer.server.port=1234"
+
   postgres:
     image: postgres:15.3-alpine3.18
     restart: always

@@ -23,7 +23,7 @@ WORKDIR /lemmy-ui
 RUN cp /tmp/lemmy-ui/package.json /tmp/lemmy-ui/yarn.lock . && \
     yarn --production --prefer-offline --pure-lockfile
 
-RUN cp -a /tmp/lemmy-ui/. . && rm -r /tmp/lemmy-ui && \
+RUN cp -r /tmp/lemmy-ui/. . && rm -r /tmp/lemmy-ui && \
     echo "export const VERSION = '$(git describe --tag)';" > "src/shared/version.ts" && \
     yarn build:prod
 
