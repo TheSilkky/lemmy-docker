@@ -81,7 +81,9 @@ RUN apk add --no-cache \
 COPY --from=build --chmod=0755 /pict-rs/pict-rs /usr/local/bin
 COPY root /
 
-RUN adduser --disabled-password --gecos "" --no-create-home pictrs
+RUN adduser --disabled-password --gecos "" --no-create-home pictrs && \
+    mkdir -p ${DATA_PATH} && \
+    chown -R pictrs:pictrs ${DATA_PATH}
 
 USER pictrs
 

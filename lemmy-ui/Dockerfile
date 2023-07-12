@@ -9,8 +9,12 @@ ARG LEMMY_UI_VERSION
 ####################################################################################################
 FROM --platform=${BUILDPLATFORM} node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS builder
 
+ARG TARGETARCH
 ARG LEMMY_UI_VERSION
 
+ENV npm_config_target_arch=${TARGETARCH}
+ENV npm_config_target_platform=linux
+ENV npm_config_target_libc=musl
 ENV NODE_OPTIONS=--max_old_space_size=8192
 
 RUN apk add --no-cache \
