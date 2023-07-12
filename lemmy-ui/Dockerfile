@@ -2,11 +2,10 @@ ARG NODE_VERSION=20.4.0
 ARG ALPINE_VERSION=3.18
 
 ####################################################################################################
-## ARM64 builder
+## Builder
 ####################################################################################################
-FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS build-arm64
+FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS builder
 
-ENV npm_config_target_arch=aarch64
 ENV npm_config_target_platform=linux
 ENV npm_config_target_libc=musl
 ENV NODE_OPTIONS=--max_old_space_size=8192
@@ -23,34 +22,6 @@ RUN yarn install --production --prefer-offline
 COPY lemmy-ui ./
 RUN echo "export const VERSION = '$(git describe --tag)';" > "src/shared/version.ts" && \
     yarn build:prod
-
-####################################################################################################
-## AMD64 builder
-####################################################################################################
-FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS build-amd64
-
-ENV npm_config_target_arch=x64
-ENV npm_config_target_platform=linux
-ENV npm_config_target_libc=musl
-ENV NODE_OPTIONS=--max_old_space_size=8192
-
-RUN apk add --no-cache \
-    build-base \
-    git
-
-WORKDIR /lemmy-ui
-
-COPY lemmy-ui/package.json lemmy-ui/yarn.lock ./
-RUN yarn install --production --prefer-offline
-
-COPY lemmy-ui ./
-RUN echo "export const VERSION = '$(git describe --tag)';" > "src/shared/version.ts" && \
-    yarn build:prod
-
-####################################################################################################
-## Intermediate build stage 
-####################################################################################################
-FROM build-${TARGETARCH} AS build
 
 ####################################################################################################
 ## Final image

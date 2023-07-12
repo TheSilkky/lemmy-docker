@@ -112,6 +112,9 @@ jobs:
           flavor: |
             latest=true
 
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v2
+
       - name: Setup Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v2
@@ -145,7 +148,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
-          context: ./lemmy
+          context: ./lemmy-ui
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
