@@ -26,7 +26,7 @@ ADD --keep-git-dir=true https://github.com/LemmyNet/lemmy-ui.git#${LEMMY_UI_VERS
 WORKDIR /lemmy-ui
 
 RUN cp /tmp/lemmy-ui/package.json /tmp/lemmy-ui/yarn.lock . && \
-    yarn install --production --prefer-offline
+    yarn --production --prefer-offline
 
 RUN cp -a /tmp/lemmy-ui/. . && rm -r /tmp/lemmy-ui && \
     echo "export const VERSION = '$(git describe --tag)';" > "src/shared/version.ts" && \

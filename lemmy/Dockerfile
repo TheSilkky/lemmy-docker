@@ -9,6 +9,8 @@ ARG LEMMY_VERSION
 ####################################################################################################
 FROM --platform=${BUILDPLATFORM} blackdex/rust-musl:aarch64-musl-stable-${RUST_VERSION} AS build-arm64
 
+ARG LEMMY_VERSION
+
 ENV DEBIAN_FRONTEND=noninteractive
 ENV CARGO_HOME="/root/.cargo"
 
@@ -26,6 +28,8 @@ RUN cargo build --target=aarch64-unknown-linux-musl --release
 ## AMD64 builder
 ####################################################################################################
 FROM --platform=${BUILDPLATFORM} blackdex/rust-musl:x86_64-musl-stable-${RUST_VERSION} AS build-amd64
+
+ARG LEMMY_VERSION
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV CARGO_HOME="/root/.cargo"
