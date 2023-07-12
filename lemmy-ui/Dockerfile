@@ -12,6 +12,7 @@ ENV NODE_OPTIONS=--max_old_space_size=8192
 
 RUN apk add --no-cache \
     build-base \
+    python3 \
     git
 
 WORKDIR /lemmy-ui
