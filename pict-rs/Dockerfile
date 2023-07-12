@@ -57,12 +57,20 @@ RUN set -ex; \
             amd64) target='x86_64-unknown-linux-musl' ;; \
             *) exit 1 ;; \
         esac; \
-        mv "/pic-rs/target/$target/release/pict-rs" /pict-rs/pict-rs
+        mv "/pict-rs/target/$target/release/pict-rs" /pict-rs/pict-rs
 
 ####################################################################################################
 ### Final image
 ####################################################################################################
 FROM alpine:${ALPINE_VERSION} 
+
+ARG PORT=8080
+ARG DATA_PATH=/var/lib/pict-rs
+
+ENV PICTRS__SERVER__ADDRESS="0.0.0.0:${PORT}"
+ENV PICTRS__REPO__PATH="${DATA_PATH}/sled"
+ENV PICTRS__REPO__EXPORT_PATH="${DATA_PATH}/sled-exports"
+ENV PICTRS__STORE__PATH="${DATA_PATH}/files"
 
 RUN apk add --no-cache \
     ca-certificates \
@@ -79,7 +87,9 @@ USER pictrs
 
 CMD ["pict-rs", "run"]
 
-EXPOSE 8080
+EXPOSE ${PORT}
+
+VOLUME ${DATA_PATH}
 
 STOPSIGNAL SIGTERM
 
