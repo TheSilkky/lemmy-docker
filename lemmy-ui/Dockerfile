@@ -31,7 +31,7 @@ FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION}
 WORKDIR /lemmy-ui
 
 COPY lemmy-ui/package.json lemmy-ui/yarn.lock ./
-COPY --from=build /lemmy-ui/dist ./dist
+COPY --from=builder /lemmy-ui/dist ./dist
 
 RUN yarn install --production --prefer-offline && \
     yarn cache clean && \
