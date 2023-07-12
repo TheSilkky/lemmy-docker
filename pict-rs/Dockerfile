@@ -78,7 +78,7 @@ RUN apk add --no-cache \
     ffmpeg \
     exiftool
 
-COPY --from=build --chmod=0755 /pict-rs/pict-rs /usr/local/bin/pict-rs
+COPY --from=build --chmod=0755 /pict-rs/pict-rs /usr/local/bin
 COPY root /
 
 RUN adduser --disabled-password --gecos "" --no-create-home pictrs

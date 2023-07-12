@@ -5,19 +5,39 @@ networks:
 volumes:
   database:
 
+configs:
+  lemmy-config:
+    file: ./lemmy.hjson.tpl
+
 services:
   lemmy:
     image: thesilkky/lemmy:0.18.1
     container_name: lemmy
     depends_on:
       - postgres
+      - pictrs
     restart: always
     hostname: lemmy
     networks:
       - public
       - default
+    configs:
+      - source: lemmy-config
+        target: /usr/local/etc/lemmy/lemmy.hjson.tpl
     environment:
-      - LEMMY_DATABASE_URL=postgres://lemmy:${DATABASE_PASSWORD}@lemmy:5432/lemmy
+      - LEMMY_HOSTNAME=${HOST}
+      - LEMMY_DATABASE_URI=postgres://lemmy:${DATABASE_PASSWORD}@lemmy:5432/lemmy
+      - LEMMY_PICTRS_URL=http://pictrs:8080/
+      - LEMMY_PICTRS_API_KEY=${PICTRS_API_KEY}
+      - LEMMY_SMTP_SERVER=${SMTP_SERVER}
+      - LEMMY_SMTP_LOGIN=${SMTP_LOGIN}
+      - LEMMY_SMTP_PASSWORD=${SMTP_PASSWORD}
+      - LEMMY_SMTP_FROM_ADDRESS=${SMTP_FROM_ADDRESS}
+      - LEMMY_SMTP_TLS_TYPE=${SMTP_TLS_TYPE}
+      - LEMMY_SETUP_ADMIN_USERNAME=${SETUP_ADMIN_USERNAME}
+      - LEMMY_SETUP_ADMIN_PASSWORD=${SETUP_ADMIN_PASSWORD}
+      - LEMMY_SETUP_ADMIN_EMAIL=${SETUP_ADMIN_EMAIL}
+      - LEMMY_SETUP_SITE_NAME=${SETUP_SITE_NAME}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.lemmy.rule=Host(`${HOST}`) && PathRegexp(`^/(api|pictrs|feeds|nodeinfo|\.well-known)$`) || (Method(`GET`, `HEAD`) && HeaderRegexp(`Accept`, `^application/(activity|ld)\+json$`)) || !Method(`GET`, `HEAD`)"

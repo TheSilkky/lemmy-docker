@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+
+LEMMY_CONFIG_TEMPLATE_DEFAULT="/usr/local/etc/lemmy/lemmy.hjson.tpl"
+export LEMMY_CONFIG_TEMPLATE="${LEMMY_CONFIG_TEMPLATE:-$LEMMY_CONFIG_TEMPLATE_DEFAULT}"
+
+envsubst < "${LEMMY_CONFIG_TEMPLATE}" > "${LEMMY_CONFIG_LOCATION}"
+
+exec "$@"

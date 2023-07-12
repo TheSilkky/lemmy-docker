@@ -69,14 +69,18 @@ ARG CONFIG_LOCATION=/usr/local/etc/lemmy/lemmy.hjson
 ENV LEMMY_CONFIG_LOCATION=${CONFIG_LOCATION}
 
 RUN apk add --no-cache \
-    ca-certificates
+    ca-certificates \
+    gettext-envsubst
 
-COPY --from=build --chmod=0755 /lemmy/lemmy /usr/local/bin/lemmy
+COPY --from=build --chmod=0755 /lemmy/lemmy /usr/local/bin
+COPY --chmod=0755 entrypoint.sh /
 
 RUN adduser --disabled-password --gecos "" --no-create-home lemmy && \
     mkdir -p /usr/local/etc/lemmy
 
 USER lemmy
+
+ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["lemmy"]
 
