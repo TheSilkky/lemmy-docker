@@ -12,6 +12,10 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  lemmy_version: "0.18.1"
+  lemmy_ui_version: "0.18.1"
+
 jobs:
   lemmy:
     runs-on: ubuntu-latest
@@ -34,7 +38,7 @@ jobs:
             type=ref,event=pr
             type=sha
             type=sha,format=long
-            type=semver,pattern={{version}},value=v0.18.1
+            type=semver,pattern={{version}},value=v${{ env.lemmy_version }}
           flavor: |
             latest=true
 
@@ -72,6 +76,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: ./lemmy
+          build-args: LEMMY_VERSION=${{ env.lemmy_version }}
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
@@ -108,7 +113,7 @@ jobs:
             type=ref,event=pr
             type=sha
             type=sha,format=long
-            type=semver,pattern={{version}},value=v0.18.1
+            type=semver,pattern={{version}},value=v${{ env.lemmy_ui_version }}
           flavor: |
             latest=true
 
@@ -149,6 +154,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: ./lemmy-ui
+          build-args: LEMMY_UI_VERSION=${{ env.lemmy_ui_version }}
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}

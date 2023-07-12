@@ -1,5 +1,8 @@
+#syntax=docker/dockerfile:1-labs
+
 ARG RUST_VERSION=1.70.0
 ARG ALPINE_VERSION=3.18
+ARG LEMMY_VERSION
 
 ####################################################################################################
 ## ARM64 builder
@@ -13,9 +16,10 @@ RUN mkdir -pv "${CARGO_HOME}" && \
     rustup set profile minimal && \
     rustup target add aarch64-unknown-linux-musl
 
+ADD --keep-git-dir=true https://github.com/LemmyNet/lemmy.git#${LEMMY_VERSION} /lemmy
+
 WORKDIR /lemmy
 
-COPY lemmy ./
 RUN cargo build --target=aarch64-unknown-linux-musl --release
 
 ####################################################################################################
@@ -30,9 +34,10 @@ RUN mkdir -pv "${CARGO_HOME}" && \
     rustup set profile minimal && \
     rustup target add x86_64-unknown-linux-musl
 
+ADD --keep-git-dir=true https://github.com/LemmyNet/lemmy.git#${LEMMY_VERSION} /lemmy
+
 WORKDIR /lemmy
 
-COPY lemmy ./
 RUN cargo build --target=x86_64-unknown-linux-musl --release
 
 ####################################################################################################
