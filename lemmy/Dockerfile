@@ -60,7 +60,7 @@ FROM base-amd64 AS build-amd64
 WORKDIR /lemmy
 
 COPY --from=chef-prepare /lemmy/recipe.json ./
-RUN cargo chef cook --target=x86_64-unknown-linux-musl --release --recipe-path recipe.json
+RUN cat recipe.json && cargo chef cook --target=x86_64-unknown-linux-musl --release --recipe-path recipe.json
 
 COPY --from=source /lemmy ./
 RUN echo "pub const VERSION: &str = \"$(git describe --tag)\";" > crates/utils/src/version.rs && \
