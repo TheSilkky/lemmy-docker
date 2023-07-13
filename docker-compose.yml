@@ -23,7 +23,7 @@ services:
       - default
     configs:
       - source: lemmy-config
-       target: /usr/local/etc/lemmy/lemmy.hjson.tpl
+        target: /usr/local/etc/lemmy/lemmy.hjson.tpl
     environment:
       - LEMMY_HOSTNAME=${HOST}
       - LEMMY_DATABASE_URI=postgres://lemmy:${DATABASE_PASSWORD}@lemmy:5432/lemmy
