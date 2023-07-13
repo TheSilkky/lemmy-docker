@@ -64,9 +64,9 @@ RUN set -ex; \
 ####################################################################################################
 FROM alpine:${ALPINE_VERSION} 
 
-ARG CONFIG_LOCATION=/usr/local/etc/lemmy/lemmy.hjson
+ARG CONFIG_DIR=/usr/local/etc/lemmy
 
-ENV LEMMY_CONFIG_LOCATION=${CONFIG_LOCATION}
+ENV LEMMY_CONFIG_LOCATION="${CONFIG_DIR}/lemmy.hjson"
 
 RUN apk add --no-cache \
     ca-certificates \
@@ -76,7 +76,8 @@ COPY --from=build --chmod=0755 /lemmy/lemmy /usr/local/bin
 COPY --chmod=0755 entrypoint.sh /
 
 RUN adduser --disabled-password --gecos "" --no-create-home lemmy && \
-    mkdir -p /usr/local/etc/lemmy
+    mkdir -p "${CONFIG_DIR}" && \
+    chown -R lemmy:lemmy "${CONFIG_DIR}"
 
 USER lemmy
 
