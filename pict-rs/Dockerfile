@@ -5,7 +5,35 @@ ARG ALPINE_VERSION=3.18
 ARG PICTRS_VERSION
 
 ####################################################################################################
-## Source code
+## AMD64 builder base
+####################################################################################################
+FROM --platform=${BUILDPLATFORM} blackdex/rust-musl:x86_64-musl-stable-${RUST_VERSION} AS base-amd64
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV CARGO_HOME="/root/.cargo"
+
+RUN mkdir -pv "${CARGO_HOME}" && \
+    rustup set profile minimal && \
+    rustup target add x86_64-unknown-linux-musl
+
+RUN cargo install chef
+
+####################################################################################################
+## ARM64 builder base
+####################################################################################################
+FROM --platform=${BUILDPLATFORM} blackdex/rust-musl:aarch64-musl-stable-${RUST_VERSION} AS base-arm64
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV CARGO_HOME="/root/.cargo"
+
+RUN mkdir -pv "${CARGO_HOME}" && \
+    rustup set profile minimal && \
+    rustup target add aarch64-unknown-linux-musl
+
+RUN cargo install chef
+
+####################################################################################################
+## Get source code
 ####################################################################################################
 FROM alpine:${ALPINE_VERSION} AS source
 
@@ -14,14 +42,9 @@ ARG PICTRS_VERSION
 ADD --keep-git-dir=true https://git.asonix.dog/asonix/pict-rs.git#v${PICTRS_VERSION} /pict-rs
 
 ####################################################################################################
-## Chef recipe
+## Generate cargo-chef recipe
 ####################################################################################################
-FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} AS chef-prepare
-
-RUN apk add --no-cache \
-    build-base
-
-RUN cargo install cargo-chef
+FROM base-amd64 AS chef-prepare
 
 WORKDIR /pict-rs
 
@@ -32,15 +55,7 @@ RUN cargo chef prepare --recipe-path recipe.json
 ####################################################################################################
 ## AMD64 builder
 ####################################################################################################
-FROM --platform=${BUILDPLATFORM} blackdex/rust-musl:x86_64-musl-stable-${RUST_VERSION} AS build-amd64
-
-ENV DEBIAN_FRONTEND=noninteractive
-ENV CARGO_HOME="/root/.cargo"
-
-RUN mkdir -pv "${CARGO_HOME}" && \
-    rustup set profile minimal && \
-    rustup target add x86_64-unknown-linux-musl && \
-    cargo install cargo-chef
+FROM base-amd64 AS build-amd64
 
 WORKDIR /pict-rs
 
@@ -53,15 +68,7 @@ RUN cargo build --target=x86_64-unknown-linux-musl --release
 ####################################################################################################
 ## ARM64 builder
 ####################################################################################################
-FROM --platform=${BUILDPLATFORM} blackdex/rust-musl:aarch64-musl-stable-${RUST_VERSION} AS build-arm64
-
-ENV DEBIAN_FRONTEND=noninteractive
-ENV CARGO_HOME="/root/.cargo"
-
-RUN mkdir -pv "${CARGO_HOME}" && \
-    rustup set profile minimal && \
-    rustup target add aarch64-unknown-linux-musl && \
-    cargo install cargo-chef
+FROM base-arm64 AS build-arm64
 
 WORKDIR /pict-rs
 
@@ -72,7 +79,7 @@ COPY --from=source /pict-rs ./
 RUN cargo build --target=aarch64-unknown-linux-musl --release
 
 ####################################################################################################
-## Intermediate build stage 
+## Move binary
 ####################################################################################################
 FROM build-${TARGETARCH} AS build
 
