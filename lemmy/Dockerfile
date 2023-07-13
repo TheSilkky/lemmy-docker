@@ -5,44 +5,68 @@ ARG ALPINE_VERSION=3.18
 ARG LEMMY_VERSION
 
 ####################################################################################################
-## ARM64 builder
+## Source code
 ####################################################################################################
-FROM --platform=${BUILDPLATFORM} blackdex/rust-musl:aarch64-musl-stable-${RUST_VERSION} AS build-arm64
+FROM alpine:${ALPINE_VERSION} AS source
 
 ARG LEMMY_VERSION
 
-ENV DEBIAN_FRONTEND=noninteractive
-ENV CARGO_HOME="/root/.cargo"
-
-RUN mkdir -pv "${CARGO_HOME}" && \
-    rustup set profile minimal && \
-    rustup target add aarch64-unknown-linux-musl
-
 ADD --keep-git-dir=true https://github.com/LemmyNet/lemmy.git#${LEMMY_VERSION} /lemmy
+
+####################################################################################################
+## Chef recipe
+####################################################################################################
+FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} AS chef-prepare
+
+RUN cargo install cargo-chef
 
 WORKDIR /lemmy
 
-RUN cargo build --target=aarch64-unknown-linux-musl --release
+COPY --from=source /lemmy ./
+
+RUN cargo chef prepare --recipe-path recipe.json
 
 ####################################################################################################
 ## AMD64 builder
 ####################################################################################################
 FROM --platform=${BUILDPLATFORM} blackdex/rust-musl:x86_64-musl-stable-${RUST_VERSION} AS build-amd64
 
-ARG LEMMY_VERSION
+ENV DEBIAN_FRONTEND=noninteractive
+ENV CARGO_HOME="/root/.cargo"
+
+RUN mkdir -pv "${CARGO_HOME}" && \
+    rustup set profile minimal && \
+    rustup target add x86_64-unknown-linux-musl && \
+    cargo install cargo-chef
+
+WORKDIR /lemmy
+
+COPY --from=chef-prepare /lemmy/recipe.json ./
+RUN cargo chef cook --target=x86_64-unknown-linux-musl --release --recipe-path recipe.json
+
+COPY --from=source /lemmy ./
+RUN cargo build --target=x86_64-unknown-linux-musl --release
+
+####################################################################################################
+## ARM64 builder
+####################################################################################################
+FROM --platform=${BUILDPLATFORM} blackdex/rust-musl:aarch64-musl-stable-${RUST_VERSION} AS build-arm64
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV CARGO_HOME="/root/.cargo"
 
 RUN mkdir -pv "${CARGO_HOME}" && \
     rustup set profile minimal && \
-    rustup target add x86_64-unknown-linux-musl
-
-ADD --keep-git-dir=true https://github.com/LemmyNet/lemmy.git#${LEMMY_VERSION} /lemmy
+    rustup target add aarch64-unknown-linux-musl && \
+    cargo install cargo-chef
 
 WORKDIR /lemmy
 
-RUN cargo build --target=x86_64-unknown-linux-musl --release
+COPY --from=chef-prepare /lemmy/recipe.json ./
+RUN cargo chef cook --target=aarch64-unknown-linux-musl --release --recipe-path recipe.json
+
+COPY --from=source /lemmy ./
+RUN cargo build --target=aarch64-unknown-linux-musl --release
 
 ####################################################################################################
 ## Intermediate build stage 
