@@ -12,6 +12,10 @@ FROM --platform=${BUILDPLATFORM} blackdex/rust-musl:x86_64-musl-stable-${RUST_VE
 ENV DEBIAN_FRONTEND=noninteractive
 ENV CARGO_HOME="/root/.cargo"
 
+RUN apt update && apt install -y \
+    --no-install-recommends \
+    git
+
 RUN mkdir -pv "${CARGO_HOME}" && \
     rustup set profile minimal && \
     rustup target add x86_64-unknown-linux-musl
@@ -25,6 +29,10 @@ FROM --platform=${BUILDPLATFORM} blackdex/rust-musl:aarch64-musl-stable-${RUST_V
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV CARGO_HOME="/root/.cargo"
+
+RUN apt update && apt install -y \
+    --no-install-recommends \
+    git
 
 RUN mkdir -pv "${CARGO_HOME}" && \
     rustup set profile minimal && \
@@ -60,7 +68,7 @@ FROM base-amd64 AS build-amd64
 WORKDIR /lemmy
 
 COPY --from=chef-prepare /lemmy/recipe.json ./
-RUN cat recipe.json && cargo chef cook --target=x86_64-unknown-linux-musl --release --recipe-path recipe.json
+RUN cargo chef cook --target=x86_64-unknown-linux-musl --release --recipe-path recipe.json
 
 COPY --from=source /lemmy ./
 RUN echo "pub const VERSION: &str = \"$(git describe --tag)\";" > crates/utils/src/version.rs && \
