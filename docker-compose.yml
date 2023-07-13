@@ -1,3 +1,5 @@
+version: "3.8"
+
 networks:
   public:
     external: true
@@ -7,23 +9,18 @@ volumes:
   pictrs_data:
 
 configs:
-  lemmy-config:
+  lemmy_config:
     file: ./lemmy.hjson.tpl
 
 services:
   lemmy:
     image: thesilkky/lemmy:0.18.1
-    container_name: lemmy
-    depends_on:
-      - postgres
-      - pictrs
-    restart: always
     hostname: lemmy
     networks:
       - public
       - default
     configs:
-      - source: lemmy-config
+      - source: lemmy_config
         target: /usr/local/etc/lemmy/lemmy.hjson.tpl
     environment:
       - LEMMY_HOSTNAME=${HOST}
@@ -35,17 +32,17 @@ services:
       - LEMMY_SMTP_PASSWORD=${SMTP_PASSWORD}
       - LEMMY_SMTP_FROM_ADDRESS=${SMTP_FROM_ADDRESS}
       - LEMMY_SMTP_TLS_TYPE=${SMTP_TLS_TYPE}
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.lemmy.rule=Host(`${HOST}`) && (PathPrefix(`/api`) || PathPrefix(`/pictrs`) || PathPrefix(`/feeds`) || PathPrefix(`/nodeinfo`) || PathPrefix(`/.well-known`) || (!Method(`GET`) && !Method(`HEAD`)) || ((Method(`GET`) || Method(`HEAD`)) && HeaderRegexp(`Accept`, `^.*?application/(?:activity|ld)\\+json$$`)))"
-      - "traefik.http.routers.lemmy.entryPoints=websecure"
-      - "traefik.http.routers.lemmy.tls.certResolver=le"
-      - "traefik.http.routers.lemmy.service=lemmy"
-      - "traefik.http.services.lemmy.loadbalancer.server.port=8536"
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.lemmy.rule=Host(`${HOST}`) && (PathPrefix(`/api`) || PathPrefix(`/pictrs`) || PathPrefix(`/feeds`) || PathPrefix(`/nodeinfo`) || PathPrefix(`/.well-known`) || (!Method(`GET`) && !Method(`HEAD`)) || ((Method(`GET`) || Method(`HEAD`)) && HeaderRegexp(`Accept`, `^.*?application/(?:activity|ld)\\+json$$`)))"
+        - "traefik.http.routers.lemmy.entryPoints=websecure"
+        - "traefik.http.routers.lemmy.tls.certResolver=le"
+        - "traefik.http.routers.lemmy.service=lemmy"
+        - "traefik.http.services.lemmy.loadbalancer.server.port=8536"
 
   lemmy-ui:
     image: thesilkky/lemmy-ui:0.18.1
-    restart: always
     hostname: lemmy-ui
     networks:
       - public
@@ -54,17 +51,17 @@ services:
       - LEMMY_UI_LEMMY_INTERNAL_HOST=lemmy:8536
       - LEMMY_UI_LEMMY_EXTERNAL_HOST=${HOST}
       - LEMMY_UI_HTTPS=true
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.lemmy-ui.rule=Host(`${HOST}`)"
-      - "traefik.http.routers.lemmy-ui.entryPoints=websecure"
-      - "traefik.http.routers.lemmy-ui.tls.certResolver=le"
-      - "traefik.http.routers.lemmy-ui.service=lemmy-ui"
-      - "traefik.http.services.lemmy-ui.loadbalancer.server.port=1234"
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.lemmy-ui.rule=Host(`${HOST}`)"
+        - "traefik.http.routers.lemmy-ui.entryPoints=websecure"
+        - "traefik.http.routers.lemmy-ui.tls.certResolver=le"
+        - "traefik.http.routers.lemmy-ui.service=lemmy-ui"
+        - "traefik.http.services.lemmy-ui.loadbalancer.server.port=1234"
 
   postgres:
     image: postgres:15.3-alpine3.18
-    restart: always
     hostname: postgres
     volumes:
       - database:/var/lib/postgresql/data
@@ -76,7 +73,6 @@ services:
 
   pictrs:
     image: thesilkky/pict-rs:0.4.0
-    restart: always
     hostname: pictrs
     volumes:
       - pictrs_data:/var/lib/pict-rs
