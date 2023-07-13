@@ -16,7 +16,7 @@ RUN mkdir -pv "${CARGO_HOME}" && \
     rustup set profile minimal && \
     rustup target add x86_64-unknown-linux-musl
 
-RUN cargo install chef
+RUN cargo install cargo-chef
 
 ####################################################################################################
 ## ARM64 builder base
@@ -30,7 +30,7 @@ RUN mkdir -pv "${CARGO_HOME}" && \
     rustup set profile minimal && \
     rustup target add aarch64-unknown-linux-musl
 
-RUN cargo install chef
+RUN cargo install cargo-chef
 
 ####################################################################################################
 ## Get source code
