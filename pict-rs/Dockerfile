@@ -18,6 +18,9 @@ ADD --keep-git-dir=true https://git.asonix.dog/asonix/pict-rs.git#v${PICTRS_VERS
 ####################################################################################################
 FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} AS chef-prepare
 
+RUN apk add --no-cache \
+    build-base
+
 RUN cargo install cargo-chef
 
 WORKDIR /pict-rs

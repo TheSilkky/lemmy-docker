@@ -18,6 +18,9 @@ ADD --keep-git-dir=true https://github.com/LemmyNet/lemmy.git#${LEMMY_VERSION} /
 ####################################################################################################
 FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} AS chef-prepare
 
+RUN apk add --no-cache \
+    build-base
+
 RUN cargo install cargo-chef
 
 WORKDIR /lemmy
