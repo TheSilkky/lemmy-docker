@@ -37,7 +37,6 @@ services:
         - "traefik.enable=true"
         - "traefik.http.routers.lemmy.rule=Host(`${HOST}`) && (PathPrefix(`/api`) || PathPrefix(`/pictrs`) || PathPrefix(`/feeds`) || PathPrefix(`/nodeinfo`) || PathPrefix(`/.well-known`) || (!Method(`GET`) && !Method(`HEAD`)) || ((Method(`GET`) || Method(`HEAD`)) && HeaderRegexp(`Accept`, `^.*?application/(?:activity|ld)\\+json$$`)))"
         - "traefik.http.routers.lemmy.priority=20"
-        - "traefik.http.routers.lemmy.entryPoints=websecure"
         - "traefik.http.routers.lemmy.tls.certResolver=le"
         - "traefik.http.routers.lemmy.service=lemmy"
         - "traefik.http.services.lemmy.loadbalancer.server.port=8536"
@@ -55,11 +54,14 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.lemmy-ui.rule=Host(`${HOST}`) || (Host(`${HOST}`) && Path(`/.well-known/security.txt`))"
+        - "traefik.http.routers.lemmy-ui.rule=Host(`${HOST}`)"
         - "traefik.http.routers.lemmy-ui.priority=10"
-        - "traefik.http.routers.lemmy-ui.entryPoints=websecure"
         - "traefik.http.routers.lemmy-ui.tls.certResolver=le"
         - "traefik.http.routers.lemmy-ui.service=lemmy-ui"
+        - "traefik.http.routers.lemmy-security-txt.rule=Host(`${HOST}`) && Path(`/.well-known/security.txt`)"
+        - "traefik.http.routers.lemmy-security-txt.priority=30"
+        - "traefik.http.routers.lemmy-security-txt.tls.certResolver=le"
+        - "traefik.http.routers.lemmy-security-txt.service=lemmy-ui"
         - "traefik.http.services.lemmy-ui.loadbalancer.server.port=1234"
 
   postgres:
