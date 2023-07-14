@@ -14,7 +14,7 @@ configs:
 
 services:
   lemmy:
-    image: thesilkky/lemmy:0.18.1
+    image: thesilkky/lemmy:0.18.2
     hostname: lemmy
     networks:
       - public
@@ -42,7 +42,7 @@ services:
         - "traefik.http.services.lemmy.loadbalancer.server.port=8536"
 
   lemmy-ui:
-    image: thesilkky/lemmy-ui:0.18.1
+    image: thesilkky/lemmy-ui:0.18.2
     hostname: lemmy-ui
     networks:
       - public
