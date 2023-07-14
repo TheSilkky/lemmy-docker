@@ -16,7 +16,7 @@ RUN mkdir -pv "${CARGO_HOME}" && \
     rustup set profile minimal && \
     rustup target add x86_64-unknown-linux-musl
 
-RUN cargo install cargo-chef
+#RUN cargo install cargo-chef
 
 ####################################################################################################
 ## ARM64 builder base
@@ -30,7 +30,7 @@ RUN mkdir -pv "${CARGO_HOME}" && \
     rustup set profile minimal && \
     rustup target add aarch64-unknown-linux-musl
 
-RUN cargo install cargo-chef
+#RUN cargo install cargo-chef
 
 ####################################################################################################
 ## Get source code
@@ -44,13 +44,13 @@ ADD --keep-git-dir=true https://git.asonix.dog/asonix/pict-rs.git#v${PICTRS_VERS
 ####################################################################################################
 ## Generate cargo-chef recipe
 ####################################################################################################
-FROM base-amd64 AS chef-prepare
-
-WORKDIR /pict-rs
-
-COPY --from=source /pict-rs ./
-
-RUN cargo chef prepare --recipe-path recipe.json
+#FROM base-amd64 AS chef-prepare
+#
+#WORKDIR /pict-rs
+#
+#COPY --from=source /pict-rs ./
+#
+#RUN cargo chef prepare --recipe-path recipe.json
 
 ####################################################################################################
 ## AMD64 builder
@@ -59,8 +59,8 @@ FROM base-amd64 AS build-amd64
 
 WORKDIR /pict-rs
 
-COPY --from=chef-prepare /pict-rs/recipe.json ./
-RUN cargo chef cook --target=x86_64-unknown-linux-musl --release --recipe-path recipe.json
+#COPY --from=chef-prepare /pict-rs/recipe.json ./
+#RUN cargo chef cook --target=x86_64-unknown-linux-musl --release --recipe-path recipe.json
 
 COPY --from=source /pict-rs ./
 RUN cargo build --target=x86_64-unknown-linux-musl --release
@@ -72,8 +72,8 @@ FROM base-arm64 AS build-arm64
 
 WORKDIR /pict-rs
 
-COPY --from=chef-prepare /pict-rs/recipe.json ./
-RUN cargo chef cook --target=aarch64-unknown-linux-musl --release --recipe-path recipe.json
+#COPY --from=chef-prepare /pict-rs/recipe.json ./
+#RUN cargo chef cook --target=aarch64-unknown-linux-musl --release --recipe-path recipe.json
 
 COPY --from=source /pict-rs ./
 RUN cargo build --target=aarch64-unknown-linux-musl --release

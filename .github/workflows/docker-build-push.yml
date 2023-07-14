@@ -13,8 +13,8 @@ on:
   workflow_dispatch:
 
 env:
-  lemmy_version: "0.18.1"
-  lemmy_ui_version: "0.18.1"
+  lemmy_version: "0.18.2"
+  lemmy_ui_version: "0.18.2"
   pictrs_version: "0.4.0"
 
 jobs:
