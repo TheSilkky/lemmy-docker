@@ -36,6 +36,7 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.lemmy.rule=Host(`${HOST}`) && (PathPrefix(`/api`) || PathPrefix(`/pictrs`) || PathPrefix(`/feeds`) || PathPrefix(`/nodeinfo`) || PathPrefix(`/.well-known`) || (!Method(`GET`) && !Method(`HEAD`)) || ((Method(`GET`) || Method(`HEAD`)) && HeaderRegexp(`Accept`, `^.*?application/(?:activity|ld)\\+json$$`)))"
+        - "traefik.http.rotuers.lemmy.priority=10"
         - "traefik.http.routers.lemmy.entryPoints=websecure"
         - "traefik.http.routers.lemmy.tls.certResolver=le"
         - "traefik.http.routers.lemmy.service=lemmy"
@@ -55,6 +56,7 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.lemmy-ui.rule=Host(`${HOST}`) || (Host(`${HOST}`) && Path(`/.well-known/security.txt`))"
+        - "traefik.http.rotuers.lemmy-ui.priority=20"
         - "traefik.http.routers.lemmy-ui.entryPoints=websecure"
         - "traefik.http.routers.lemmy-ui.tls.certResolver=le"
         - "traefik.http.routers.lemmy-ui.service=lemmy-ui"
