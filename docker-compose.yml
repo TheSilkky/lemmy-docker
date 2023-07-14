@@ -57,11 +57,13 @@ services:
         - "traefik.http.routers.lemmy-ui.rule=Host(`${HOST}`)"
         - "traefik.http.routers.lemmy-ui.priority=10"
         - "traefik.http.routers.lemmy-ui.tls.certResolver=le"
+        - "traefik.http.routers.lemmy-ui.middlewares=lemmy-ui-compress"
         - "traefik.http.routers.lemmy-ui.service=lemmy-ui"
         - "traefik.http.routers.lemmy-security-txt.rule=Host(`${HOST}`) && Path(`/.well-known/security.txt`)"
         - "traefik.http.routers.lemmy-security-txt.priority=30"
         - "traefik.http.routers.lemmy-security-txt.tls.certResolver=le"
         - "traefik.http.routers.lemmy-security-txt.service=lemmy-ui"
+        - "traefik.http.middlewares.lemmy-ui-compress.compress=true"
         - "traefik.http.services.lemmy-ui.loadbalancer.server.port=1234"
 
   postgres:
