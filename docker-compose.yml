@@ -41,7 +41,7 @@ services:
         - "traefik.http.routers.lemmy.service=lemmy"
         - "traefik.http.services.lemmy.loadbalancer.server.port=8536"
 
-  lemmy-ui:
+  lemmy_ui:
     image: thesilkky/lemmy-ui:0.18.2
     hostname: lemmy-ui
     networks:
