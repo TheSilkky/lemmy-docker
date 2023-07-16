@@ -1,5 +1,5 @@
 # lemmy-docker
 
-Lemmy Docker container and Compose deployment
+Lemmy Docker containers.
 
 TODO: Fix Docker layer caching for Lemmy and pict-rs.
