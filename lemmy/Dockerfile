@@ -5,6 +5,15 @@ ARG ALPINE_VERSION=3.18
 ARG LEMMY_VERSION
 
 ####################################################################################################
+## Get source code
+####################################################################################################
+FROM scratch AS source
+
+ARG LEMMY_VERSION
+
+ADD --keep-git-dir=true https://github.com/LemmyNet/lemmy.git#${LEMMY_VERSION} /lemmy
+
+####################################################################################################
 ## AMD64 builder base
 ####################################################################################################
 FROM --platform=${BUILDPLATFORM} blackdex/rust-musl:x86_64-musl-stable-${RUST_VERSION} AS base-amd64
@@ -39,15 +48,6 @@ RUN mkdir -pv "${CARGO_HOME}" && \
     rustup target add aarch64-unknown-linux-musl
 
 #RUN cargo install cargo-chef
-
-####################################################################################################
-## Get source code
-####################################################################################################
-FROM alpine:${ALPINE_VERSION} AS source
-
-ARG LEMMY_VERSION
-
-ADD --keep-git-dir=true https://github.com/LemmyNet/lemmy.git#${LEMMY_VERSION} /lemmy
 
 ####################################################################################################
 ## Generate cargo-chef recipe
@@ -108,24 +108,19 @@ RUN set -ex; \
 ####################################################################################################
 FROM alpine:${ALPINE_VERSION} 
 
-ARG CONFIG_DIR=/usr/local/etc/lemmy
+ARG CONFIG_DIRECTORY=/usr/local/etc/lemmy
 
-ENV LEMMY_CONFIG_LOCATION="${CONFIG_DIR}/lemmy.hjson"
+ENV LEMMY_CONFIG_LOCATION="${CONFIG_DIRECTORY}/lemmy.hjson"
 
 RUN apk add --no-cache \
-    ca-certificates \
-    gettext-envsubst
+    ca-certificates
 
 COPY --from=build --chmod=0755 /lemmy/lemmy /usr/local/bin
-COPY --chmod=0755 entrypoint.sh /
 
 RUN adduser --disabled-password --gecos "" --no-create-home lemmy && \
-    mkdir -p "${CONFIG_DIR}" && \
-    chown -R lemmy:lemmy "${CONFIG_DIR}"
+    mkdir -p "${CONFIG_DIRECTORY}"
 
 USER lemmy
-
-ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["lemmy"]
 

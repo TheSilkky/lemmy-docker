@@ -5,6 +5,15 @@ ARG ALPINE_VERSION=3.18
 ARG PICTRS_VERSION
 
 ####################################################################################################
+## Get source code
+####################################################################################################
+FROM scratch AS source
+
+ARG PICTRS_VERSION
+
+ADD --keep-git-dir=true https://git.asonix.dog/asonix/pict-rs.git#v${PICTRS_VERSION} /pict-rs
+
+####################################################################################################
 ## AMD64 builder base
 ####################################################################################################
 FROM --platform=${BUILDPLATFORM} blackdex/rust-musl:x86_64-musl-stable-${RUST_VERSION} AS base-amd64
@@ -31,15 +40,6 @@ RUN mkdir -pv "${CARGO_HOME}" && \
     rustup target add aarch64-unknown-linux-musl
 
 #RUN cargo install cargo-chef
-
-####################################################################################################
-## Get source code
-####################################################################################################
-FROM alpine:${ALPINE_VERSION} AS source
-
-ARG PICTRS_VERSION
-
-ADD --keep-git-dir=true https://git.asonix.dog/asonix/pict-rs.git#v${PICTRS_VERSION} /pict-rs
 
 ####################################################################################################
 ## Generate cargo-chef recipe
