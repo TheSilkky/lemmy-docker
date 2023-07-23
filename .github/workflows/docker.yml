@@ -1,0 +1,46 @@
+name: Docker
+
+on:
+  push:
+    paths-ignore:
+      - "**.md"
+      - "**/.gitignore"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lemmy:
+    uses: thesilkky/workflows/.github/workflows/docker-build-push.yml@main
+    with:
+      image: thesilkky/lemmy
+      image-version: '0.18.2'
+      context: ./lemmy
+      build-args: LEMMY_VERSION=0.18.2
+      platforms: linux/amd64,linux/arm64
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  lemmy-ui:
+    uses: thesilkky/workflows/.github/workflows/docker-build-push.yml@main
+    with:
+      image: thesilkky/lemmy-ui
+      image-version: '0.18.2'
+      context: ./lemmy-ui
+      build-args: LEMMY_UI_VERSION=0.18.2
+      platforms: linux/amd64,linux/arm64
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  pict-rs:
+    uses: thesilkky/workflows/.github/workflows/docker-build-push.yml@main
+    with:
+      image: thesilkky/pict-rs
+      image-version: '0.4.0'
+      context: ./pict-rs
+      build-args: PICTRS_VERSION=0.4.0
+      platforms: linux/amd64,linux/arm64
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
