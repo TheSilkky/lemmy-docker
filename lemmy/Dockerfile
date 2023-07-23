@@ -72,7 +72,8 @@ WORKDIR /lemmy
 
 COPY --from=source /lemmy ./
 RUN echo "pub const VERSION: &str = \"$(git describe --tag)\";" > crates/utils/src/version.rs && \
-    cargo build --target=x86_64-unknown-linux-musl --release
+    cargo build --target=x86_64-unknown-linux-musl --release && \
+    mv target/x86_64-unknown-linux-musl/release/lemmy_server .
 
 ####################################################################################################
 ## ARM64 builder
@@ -86,28 +87,22 @@ WORKDIR /lemmy
 
 COPY --from=source /lemmy ./
 RUN echo "pub const VERSION: &str = \"$(git describe --tag)\";" > crates/utils/src/version.rs && \
-    cargo build --target=aarch64-unknown-linux-musl --release
+    cargo build --target=aarch64-unknown-linux-musl --release && \
+    mv target/aarch64-unknown-linux-musl/release/lemmy_server .
 
 ####################################################################################################
-## Move binary
+## Get target binary
 ####################################################################################################
 FROM build-${TARGETARCH} AS build
-
-ARG TARGETARCH
-
-RUN set -ex; \
-        case "${TARGETARCH}" in \
-            arm64) target='aarch64-unknown-linux-musl' ;; \
-            amd64) target='x86_64-unknown-linux-musl' ;; \
-            *) exit 1 ;; \
-        esac; \
-        mv "/lemmy/target/$target/release/lemmy_server" /lemmy/lemmy
 
 ####################################################################################################
 ### Final image
 ####################################################################################################
 FROM alpine:${ALPINE_VERSION} 
 
+ARG LEMMY_VERSION
+ARG UID=911
+ARG GID=911
 ARG CONFIG_DIRECTORY=/usr/local/etc/lemmy
 
 ENV LEMMY_CONFIG_LOCATION="${CONFIG_DIRECTORY}/lemmy.hjson"
@@ -117,7 +112,8 @@ RUN apk add --no-cache \
 
 COPY --from=build --chmod=0755 /lemmy/lemmy /usr/local/bin
 
-RUN adduser --disabled-password --gecos "" --no-create-home lemmy && \
+RUN addgroup -S -g ${GID} lemmy && \
+    adduser -S -H -D -G lemmy -u ${UID} -g "" -s /sbin/nologin lemmy && \
     mkdir -p "${CONFIG_DIRECTORY}"
 
 USER lemmy
@@ -128,7 +124,8 @@ EXPOSE 8536
 
 STOPSIGNAL SIGTERM
 
-LABEL org.opencontainers.image.source="https://github.com/TheSilkky/lemmy-docker.git"
+LABEL org.opencontainers.image.source="https://github.com/LemmyNet/lemmy.git"
+LABEL org.opencontainers.image.version=${LEMMY_VERSION}
+LABEL org.opencontainers.image.licenses="AGPL-3.0-or-later"
 LABEL org.opencontainers.image.title="Lemmy"
 LABEL org.opencontainers.image.description="A link aggregator and forum for the fediverse"
-LABEL org.opencontainers.image.licenses="AGPL-3.0-or-later"
