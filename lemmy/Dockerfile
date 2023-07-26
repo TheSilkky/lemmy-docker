@@ -73,7 +73,7 @@ WORKDIR /lemmy
 COPY --from=source /lemmy ./
 RUN echo "pub const VERSION: &str = \"$(git describe --tag)\";" > crates/utils/src/version.rs && \
     cargo build --target=x86_64-unknown-linux-musl --release && \
-    mv target/x86_64-unknown-linux-musl/release/lemmy_server .
+    mv target/x86_64-unknown-linux-musl/release/lemmy_server ./lemmy
 
 ####################################################################################################
 ## ARM64 builder
@@ -88,7 +88,7 @@ WORKDIR /lemmy
 COPY --from=source /lemmy ./
 RUN echo "pub const VERSION: &str = \"$(git describe --tag)\";" > crates/utils/src/version.rs && \
     cargo build --target=aarch64-unknown-linux-musl --release && \
-    mv target/aarch64-unknown-linux-musl/release/lemmy_server .
+    mv target/aarch64-unknown-linux-musl/release/lemmy_server ./lemmy
 
 ####################################################################################################
 ## Get target binary
