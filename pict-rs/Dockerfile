@@ -99,7 +99,6 @@ ARG DATA_PATH=/var/lib/pict-rs
 ENV PICTRS__SERVER__ADDRESS="0.0.0.0:${PORT}"
 ENV PICTRS__REPO__PATH="${DATA_PATH}/sled"
 ENV PICTRS__REPO__EXPORT_PATH="${DATA_PATH}/sled-exports"
-ENV PICTRS__STORE__PATH="${DATA_PATH}/files"
 
 RUN apk add --no-cache \
     ca-certificates \
