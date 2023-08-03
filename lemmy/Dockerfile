@@ -3,6 +3,8 @@
 ARG RUST_VERSION=1.71.0
 ARG ALPINE_VERSION=3.18
 ARG LEMMY_VERSION
+ARG UID=911
+ARG GID=911
 
 ####################################################################################################
 ## Get source code
@@ -16,10 +18,11 @@ ADD --keep-git-dir=true https://github.com/LemmyNet/lemmy.git#${LEMMY_VERSION} /
 ####################################################################################################
 ## AMD64 builder base
 ####################################################################################################
-FROM --platform=${BUILDPLATFORM} blackdex/rust-musl:x86_64-musl-stable-${RUST_VERSION} AS base-amd64
+FROM --platform=${BUILDPLATFORM} blackdex/rust-musl:x86_64-musl-stable-${RUST_VERSION}-openssl3 AS base-amd64
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV CARGO_HOME="/root/.cargo"
+ENV PQ_LIB_DIR="/usr/local/musl/pq15/lib"
 
 RUN apt update && apt install -y \
     --no-install-recommends \
@@ -34,10 +37,11 @@ RUN mkdir -pv "${CARGO_HOME}" && \
 ####################################################################################################
 ## ARM64 builder base
 ####################################################################################################
-FROM --platform=${BUILDPLATFORM} blackdex/rust-musl:aarch64-musl-stable-${RUST_VERSION} AS base-arm64
+FROM --platform=${BUILDPLATFORM} blackdex/rust-musl:aarch64-musl-stable-${RUST_VERSION}-openssl3 AS base-arm64
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV CARGO_HOME="/root/.cargo"
+ENV PQ_LIB_DIR="/usr/local/musl/pq15/lib"
 
 RUN apt update && apt install -y \
     --no-install-recommends \
@@ -101,11 +105,10 @@ FROM build-${TARGETARCH} AS build
 FROM alpine:${ALPINE_VERSION} 
 
 ARG LEMMY_VERSION
-ARG UID=911
-ARG GID=911
-ARG CONFIG_DIRECTORY=/etc/lemmy
+ARG UID
+ARG GID
 
-ENV LEMMY_CONFIG_LOCATION="${CONFIG_DIRECTORY}/lemmy.hjson"
+ENV LEMMY_CONFIG_LOCATION="/etc/lemmy/lemmy.hjson"
 
 RUN apk add --no-cache \
     ca-certificates
@@ -113,8 +116,7 @@ RUN apk add --no-cache \
 COPY --from=build --chmod=0755 /lemmy/lemmy /usr/local/bin
 
 RUN addgroup -S -g ${GID} lemmy && \
-    adduser -S -H -D -G lemmy -u ${UID} -g "" -s /sbin/nologin lemmy && \
-    mkdir -p "${CONFIG_DIRECTORY}"
+    adduser -S -H -D -G lemmy -u ${UID} -g "" -s /sbin/nologin lemmy
 
 USER lemmy
 
@@ -125,7 +127,7 @@ EXPOSE 8536
 STOPSIGNAL SIGTERM
 
 LABEL org.opencontainers.image.source="https://github.com/LemmyNet/lemmy.git"
-LABEL org.opencontainers.image.version=${LEMMY_VERSION}
+LABEL org.opencontainers.image.version="${LEMMY_VERSION}"
 LABEL org.opencontainers.image.licenses="AGPL-3.0-or-later"
 LABEL org.opencontainers.image.title="Lemmy"
 LABEL org.opencontainers.image.description="A link aggregator and forum for the fediverse"

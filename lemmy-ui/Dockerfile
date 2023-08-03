@@ -59,7 +59,7 @@ EXPOSE 1234
 STOPSIGNAL SIGTERM
 
 LABEL org.opencontainers.image.source="https://github.com/TheSilkky/lemmy-docker.git"
-LABEL org.opencontainers.image.version=${LEMMY_UI_VERSION}
+LABEL org.opencontainers.image.version="${LEMMY_UI_VERSION}"
 LABEL org.opencontainers.image.licenses="AGPL-3.0-or-later"
 LABEL org.opencontainers.image.title="Lemmy-UI"
 LABEL org.opencontainers.image.description="The official web app for Lemmy, written in inferno."

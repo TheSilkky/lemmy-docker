@@ -125,7 +125,7 @@ VOLUME ${DATA_PATH}
 STOPSIGNAL SIGTERM
 
 LABEL org.opencontainers.image.source="https://git.asonix.dog/asonix/pict-rs.git"
-LABEL org.opencontainers.image.version=${PICTRS_VERSION}
+LABEL org.opencontainers.image.version="${PICTRS_VERSION}"
 LABEL org.opencontainers.image.licenses="AGPL-3.0-or-later"
 LABEL org.opencontainers.image.title="pict-rs"
 LABEL org.opencontainers.image.description="A simple image host"
