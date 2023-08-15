@@ -13,9 +13,9 @@ jobs:
     uses: thesilkky/workflows/.github/workflows/docker-build-push.yml@main
     with:
       image: thesilkky/lemmy
-      image-version: '0.18.3'
+      image-version: '0.18.4'
       context: ./lemmy
-      build-args: LEMMY_VERSION=0.18.3
+      build-args: LEMMY_VERSION=0.18.4
       platforms: linux/amd64,linux/arm64
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -25,9 +25,9 @@ jobs:
     uses: thesilkky/workflows/.github/workflows/docker-build-push.yml@main
     with:
       image: thesilkky/lemmy-ui
-      image-version: '0.18.3'
+      image-version: '0.18.4'
       context: ./lemmy-ui
-      build-args: LEMMY_UI_VERSION=0.18.3
+      build-args: LEMMY_UI_VERSION=0.18.4
       platforms: linux/amd64,linux/arm64
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -37,9 +37,9 @@ jobs:
     uses: thesilkky/workflows/.github/workflows/docker-build-push.yml@main
     with:
       image: thesilkky/pict-rs
-      image-version: '0.4.1'
+      image-version: '0.4.2'
       context: ./pict-rs
-      build-args: PICTRS_VERSION=0.4.1
+      build-args: PICTRS_VERSION=0.4.2
       platforms: linux/amd64,linux/arm64
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
