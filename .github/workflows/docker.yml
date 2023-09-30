@@ -15,7 +15,7 @@ jobs:
       image: thesilkky/lemmy
       image-version: '0.18.5'
       context: ./lemmy
-      build-args: LEMMY_VERSION=0.18.4
+      build-args: LEMMY_VERSION=0.18.5
       platforms: linux/amd64,linux/arm64
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -27,7 +27,7 @@ jobs:
       image: thesilkky/lemmy-ui
       image-version: '0.18.5'
       context: ./lemmy-ui
-      build-args: LEMMY_UI_VERSION=0.18.4
+      build-args: LEMMY_UI_VERSION=0.18.5
       platforms: linux/amd64,linux/arm64
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
