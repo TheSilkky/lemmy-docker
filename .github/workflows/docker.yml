@@ -13,7 +13,7 @@ jobs:
     uses: thesilkky/workflows/.github/workflows/docker-build-push.yml@main
     with:
       image: thesilkky/lemmy
-      image-version: '0.18.4'
+      image-version: '0.18.5'
       context: ./lemmy
       build-args: LEMMY_VERSION=0.18.4
       platforms: linux/amd64,linux/arm64
@@ -25,7 +25,7 @@ jobs:
     uses: thesilkky/workflows/.github/workflows/docker-build-push.yml@main
     with:
       image: thesilkky/lemmy-ui
-      image-version: '0.18.4'
+      image-version: '0.18.5'
       context: ./lemmy-ui
       build-args: LEMMY_UI_VERSION=0.18.4
       platforms: linux/amd64,linux/arm64
